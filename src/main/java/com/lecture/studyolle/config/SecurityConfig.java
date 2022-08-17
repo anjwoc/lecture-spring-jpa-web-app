@@ -30,6 +30,8 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
-        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        return (web) -> web.ignoring()
+                .mvcMatchers("/node_modules/**")
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 }
