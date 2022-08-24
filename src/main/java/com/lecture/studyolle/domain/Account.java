@@ -2,6 +2,7 @@ package com.lecture.studyolle.domain;
 
 import lombok.*;
 import org.hibernate.annotations.Fetch;
+import org.springframework.mail.SimpleMailMessage;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ public class Account {
 
     private String emailCheckToken;
 
+    private LocalDateTime emailCheckTokenGeneratedAt;
     private LocalDateTime joinedAt;
 
     private String bio;
@@ -34,6 +36,8 @@ public class Account {
     private String url;
 
     private String occupation;
+
+    private String location;
 
     private String liveAround; // varchar(255)
 
@@ -51,6 +55,7 @@ public class Account {
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
     }
+
     public void completeSignUp() {
         this.emailVerified = true;
         this.joinedAt = LocalDateTime.now();
@@ -58,5 +63,9 @@ public class Account {
 
     public boolean isValidToken(String token) {
         return this.emailCheckToken.equals(token);
+    }
+
+    public boolean canSendConfirmEmail() {
+        return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
     }
 }

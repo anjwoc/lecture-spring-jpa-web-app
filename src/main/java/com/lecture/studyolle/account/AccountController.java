@@ -8,6 +8,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
@@ -43,6 +44,24 @@ public class AccountController {
         return "redirect:/";
     }
 
+    @GetMapping("/check-email")
+    public String checkEmail(@CurrentUser Account account, Model model){
+        model.addAttribute("email", account.getEmail());
+        return "account/check-email";
+    }
+
+    @GetMapping("/resend-confirm-email")
+    public String resendConfirmEmail(@CurrentUser Account account, Model model) {
+        if (!account.canSendConfirmEmail()) {
+            model.addAttribute("error", "인증 이메일은 1시간에 한번만 전송할 수 있습니다.");
+            model.addAttribute("email", account.getEmail());
+            return "account/check-email";
+        }
+
+        accountService.sendSignUpConfirmEmail(account);
+        return "redirect:/";
+    }
+
     @GetMapping("/check-email-token")
     public String checkEmailToken(String token, String email, Model model) {
         Account account = accountRepository.findByEmail(email);
@@ -57,10 +76,22 @@ public class AccountController {
             return "account/checked-email";
         }
 
-        account.completeSignUp();
-        accountService.login(account);
+        accountService.completeSignUp(account);
+
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
         return "account/checked-email";
+    }
+
+    @GetMapping("/profile/{nickname}")
+    public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser Account account) {
+        Account byNickname = accountRepository.findByNickname(nickname);
+        if (nickname == null) {
+            throw new IllegalArgumentException(nickname +"에 해당하는 사용자가 없습니다.");
+        }
+
+        model.addAttribute("account", byNickname);
+        model.addAttribute("isOwner", byNickname.equals(account));
+        return "account/profile";
     }
 }
