@@ -1,11 +1,9 @@
 package com.lecture.studyolle.domain;
 
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.springframework.mail.SimpleMailMessage;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

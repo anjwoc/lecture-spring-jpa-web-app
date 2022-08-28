@@ -18,8 +18,8 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class SettingsController {
     private final AccountService accountService;
-    private static final String SETTINGS_PROFILE_VIEW_NAME = "settings/profile";
-    private static final String SETTINGS_PROFILE_URL = "/settings/profile";
+    public static final String SETTINGS_PROFILE_VIEW_NAME = "settings/profile";
+    public static final String SETTINGS_PROFILE_URL = "/settings/profile";
 
 
     @GetMapping("/settings/profile")
@@ -33,10 +33,13 @@ public class SettingsController {
     @PostMapping("/settings/profile")
     public String updateProfile(@CurrentUser Account account, @Valid Profile profile, Errors errors, Model model,
                                 RedirectAttributes attributes) {
+
         if (errors.hasErrors()){
             model.addAttribute(account);
             return SETTINGS_PROFILE_VIEW_NAME;
         }
+
+        System.out.println(profile.getProfileImage());
 
         accountService.updateProfile(account, profile);
         attributes.addFlashAttribute("message", "프로필을 수정했습니다.");
